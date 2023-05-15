@@ -48,7 +48,8 @@ class SHHA(Dataset):
 
         img_path = self.img_list[index]
         gt_path = self.img_map[img_path]
-        # load image and ground truth
+        # load image,ground truth and classes
+        # img, point, class = load_data((img_path, gt_path), self.train)
         img, point = load_data((img_path, gt_path), self.train)
         # applu augumentation
         if self.transform is not None:
@@ -82,6 +83,7 @@ class SHHA(Dataset):
         # pack up related infos
         target = [{} for i in range(len(point))]
         for i, _ in enumerate(point):
+            # target[i]['class'] = torch.Tensor(class[i])
             target[i]['point'] = torch.Tensor(point[i])
             image_id = int(img_path.split('/')[-1].split('.')[0].split('_')[-1]) # TODO 这里的image_id得改
             image_id = torch.Tensor([image_id]).long()
@@ -90,7 +92,7 @@ class SHHA(Dataset):
         return img, target
 
 
-def load_data(img_gt_path, train):
+def load_data(img_gt_path, train): # TODO 加上读取目标的类别
     img_path, gt_path = img_gt_path
     # load the images
     img = cv2.imread(img_path)
@@ -102,7 +104,8 @@ def load_data(img_gt_path, train):
             x = float(line.strip().split(' ')[0])
             y = float(line.strip().split(' ')[1])
             points.append([x, y])
-
+            # class = float(line.strip().split(' ')[2])
+    # return img, np.array(points), np.array(class)
     return img, np.array(points)
 
 # random crop augumentation
