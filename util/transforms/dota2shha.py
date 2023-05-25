@@ -2,8 +2,7 @@
 # 上海人群计数数据集格式为:x y 类别
 # dota数据集格式转换为上海人群计数数据集格式
 import os
-dota_train_label = '/data/ycchen/DOTA_split/train/annfiles/'
-dota_test_label = '/data/ycchen/DOTA_split/test/annfiles/'
+dota_test_label = '/data/ycchen/dota_counting/P2PNET_label/val/'
 # 读取dota_test_label下的所有txt文件
 dota_test_label_list = os.listdir(dota_test_label)
 # 将dota_test_label下的txt文件每行数据转换为上海人群计数数据集格式，并且将转换后的数据写入到shha_test_label文件夹下

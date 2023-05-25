@@ -58,6 +58,7 @@ class HungarianMatcher_Crowd(nn.Module):
         # Also concat the target labels and points
         # tgt_ids = torch.cat([v["labels"] for v in targets])
         tgt_ids = torch.cat([v["labels"] for v in targets])
+        tgt_ids = tgt_ids.type(torch.long)
         tgt_points = torch.cat([v["point"] for v in targets])
 
         # Compute the classification cost. Contrary to the loss, we don't use the NLL,

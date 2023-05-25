@@ -2,9 +2,9 @@
 import os
 import shutil
 # 设置文件夹路径
-png_folder = '/home/ipad_remote/P2PNET_ROOT/dota_split/DOTA_split_small/val/images'
-txt_folder = '/home/ipad_remote/P2PNET_ROOT/dota_split/DOTA_split_small/val/gt'
-# 获取文件列表
+png_folder = '/data/ycchen/dota_counting/images/val/images/'
+txt_folder = '/data/ycchen/dota_counting/P2PNET_label/val/'
+# 获取文件列表val
 jpg_files = sorted([f for f in os.listdir(png_folder) if f.endswith('.png')])
 txt_files = sorted([f for f in os.listdir(txt_folder) if f.endswith('.txt')])
 # 检查文件数量是否匹配

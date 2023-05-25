@@ -244,7 +244,7 @@ class SetCriterion_Crowd(nn.Module):
         self.eos_coef = eos_coef
         self.losses = losses
         empty_weight = torch.ones(self.num_classes + 1)
-        empty_weight[0] = self.eos_coef
+        empty_weight[-1] = self.eos_coef
         self.register_buffer('empty_weight', empty_weight)
 
     def loss_labels(self, outputs, targets, indices, num_points):
@@ -255,9 +255,9 @@ class SetCriterion_Crowd(nn.Module):
         src_logits = outputs['pred_logits'] # torch.Size([32, 1024, 2])
 
         idx = self._get_src_permutation_idx(indices)
-        target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)])
+        target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)]).type(torch.int64)
         target_classes = torch.full(src_logits.shape[:2], 0,
-                                    dtype=torch.int64, device=src_logits.device) # 
+                                    dtype=torch.int64, device=src_logits.device) 
         target_classes[idx] = target_classes_o
 
         loss_ce = F.cross_entropy(src_logits.transpose(1, 2), target_classes, self.empty_weight)
@@ -325,7 +325,7 @@ class SetCriterion_Crowd(nn.Module):
 # create the P2PNet model
 def build(args, training):
     # treats persons as a single class
-    num_classes = 1
+    num_classes = 16 # 之前是1
 
     backbone = build_backbone(args)
     model = P2PNet(backbone, args.row, args.line)

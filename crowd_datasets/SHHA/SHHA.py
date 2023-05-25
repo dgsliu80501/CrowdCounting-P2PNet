@@ -10,8 +10,8 @@ import scipy.io as io
 class SHHA(Dataset):
     def __init__(self, data_root, transform=None, train=False, patch=False, flip=False):
         self.root_path = data_root
-        self.train_lists = "DOTA_train.list"
-        self.eval_list = "DOTA_test.list"
+        self.train_lists = "DOTA_all_train.list"
+        self.eval_list = "DOTA_all_test.list"
         # there may exist multiple list files
         self.img_list_file = self.train_lists.split(',')
         if train:
@@ -66,7 +66,7 @@ class SHHA(Dataset):
                 point *= scale
         # random crop augumentaiton
         if self.train and self.patch:
-            img, point = random_crop(img, point)   # 经过随机crop之后point很多会变成空list
+            img, point ,class_num= random_crop(img, point, class_num)   # 经过随机crop之后point很多会变成空list, class_num也会改变
             for i, _ in enumerate(point):
                 point[i] = torch.Tensor(point[i])
         # random flipping
@@ -142,17 +142,18 @@ def load_data(img_gt_path, train): # TODO 加上读取目标的类别
             x = float(line.strip().split(' ')[0])
             y = float(line.strip().split(' ')[1])
             points.append([x, y])
-            classes_name = float(line.strip().split(' ')[2])
+            classes_name = str(line.strip().split(' ')[2])
             class_num.append(name2num(classes_name))
     # return img, np.array(points), np.array(class)
     return img, np.array(points), np.array(class_num)
 
 # random crop augumentation
-def random_crop(img, den, num_patch=4):
+def random_crop(img, den, class_num, num_patch=4): # TODO 删除没有目标的文件才能不报错
     half_h = 128  # 更改crop_size, 原128
     half_w = 128  # 更改crop_size, 原128
     result_img = np.zeros([num_patch, img.shape[0], half_h, half_w])
     result_den = []
+    result_num = []
     # crop num_patch for each image
     for i in range(num_patch):
         start_h = random.randint(0, img.size(1) - half_h)
@@ -162,12 +163,14 @@ def random_crop(img, den, num_patch=4):
         # copy the cropped rect
         result_img[i] = img[:, start_h:end_h, start_w:end_w]
         # copy the cropped points
-        idx = (den[:, 0] >= start_w) & (den[:, 0] <= end_w) & (den[:, 1] >= start_h) & (den[:, 1] <= end_h)
+        idx = (den[:, 0] >= start_w) & (den[:, 0] <= end_w) & (den[:, 1] >= start_h) & (den[:, 1] <= end_h) 
         # shift the corrdinates
         record_den = den[idx]
-        record_den[:, 0] -= start_w
+        record_num = class_num[idx]
+        record_den[:, 0] -= start_w # 减去crop的起始点
         record_den[:, 1] -= start_h
 
         result_den.append(record_den)
+        result_num.append(record_num)
 
-    return result_img, result_den
+    return result_img, result_den, result_num

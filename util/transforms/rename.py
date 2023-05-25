@@ -1,8 +1,8 @@
 import os
 
 # 设置文件夹路径
-png_folder = ''
-txt_folder = '/home/ipad_remote/P2PNET_ROOT/dota_split/DOTA_split_small/val/gt'
+png_folder = '/data/ycchen/dota_counting/images/val/images/'
+txt_folder = '/data/ycchen/dota_counting/P2PNET_label/val/'
 
 # 获取文件列表
 jpg_files = sorted([f for f in os.listdir(png_folder) if f.endswith('.png')])
