@@ -195,7 +195,7 @@ class P2PNet(nn.Module):
     def __init__(self, backbone, row=2, line=2):
         super().__init__()
         self.backbone = backbone
-        self.num_classes = 2 # 类别数
+        self.num_classes = 17 # 类别数 16+1
         # the number of all anchor points
         num_anchor_points = row * line
 
@@ -257,7 +257,7 @@ class SetCriterion_Crowd(nn.Module):
         idx = self._get_src_permutation_idx(indices)
         target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)])
         target_classes = torch.full(src_logits.shape[:2], 0,
-                                    dtype=torch.int64, device=src_logits.device) # target_classes.shape: torch.Size([32, 1024])
+                                    dtype=torch.int64, device=src_logits.device) # 
         target_classes[idx] = target_classes_o
 
         loss_ce = F.cross_entropy(src_logits.transpose(1, 2), target_classes, self.empty_weight)
