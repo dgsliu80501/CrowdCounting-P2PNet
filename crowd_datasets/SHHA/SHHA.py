@@ -49,8 +49,8 @@ class SHHA(Dataset):
         img_path = self.img_list[index]
         gt_path = self.img_map[img_path]
         # load image,ground truth and classes
-        # img, point, class = load_data((img_path, gt_path), self.train)
-        img, point = load_data((img_path, gt_path), self.train)
+        img, point, class_num = load_data((img_path, gt_path), self.train)
+        # img, point = load_data((img_path, gt_path), self.train)
         # applu augumentation
         if self.transform is not None:
             img = self.transform(img)
@@ -88,9 +88,46 @@ class SHHA(Dataset):
             image_id = int(img_path.split('/')[-1].split('.')[0].split('_')[-1]) # TODO 这里的image_id得改
             image_id = torch.Tensor([image_id]).long()
             target[i]['image_id'] = image_id 
-            target[i]['labels'] = torch.ones([point[i].shape[0]]).long() # TODO 标签修改这里即可
+            # target[i]['labels'] = torch.ones([point[i].shape[0]]).long() # TODO 标签修改这里即可
+            target[i]['labels'] = torch.Tensor(class_num[i])
         return img, target
 
+# name to number
+def name2num(name):
+    if name == 'plane':
+        return 1
+    elif name == 'ship':
+        return 2
+    elif name == 'storage-tank':
+        return 3
+    elif name == 'baseball-diamond':
+        return 4
+    elif name == 'tennis-court':
+        return 5
+    elif name == 'basketball-court':
+        return 6
+    elif name == 'ground-track-field':
+        return 7
+    elif name == 'harbor':
+        return 8
+    elif name == 'bridge':
+        return 9
+    elif name == 'large-vehicle':
+        return 10
+    elif name == 'small-vehicle':
+        return 11
+    elif name == 'helicopter':
+        return 12
+    elif name == 'roundabout':
+        return 13
+    elif name == 'soccer-ball-field':
+        return 14
+    elif name == 'swimming-pool':
+        return 15
+    elif name == 'container-crane':
+        return 16
+    else:
+        return 0
 
 def load_data(img_gt_path, train): # TODO 加上读取目标的类别
     img_path, gt_path = img_gt_path
@@ -99,14 +136,16 @@ def load_data(img_gt_path, train): # TODO 加上读取目标的类别
     img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     # load ground truth points
     points = []
+    class_num = [] # TODO 加上读取目标的类别
     with open(gt_path) as f_label:
         for line in f_label:
             x = float(line.strip().split(' ')[0])
             y = float(line.strip().split(' ')[1])
             points.append([x, y])
-            # class = float(line.strip().split(' ')[2])
+            classes_name = float(line.strip().split(' ')[2])
+            class_num.append(name2num(classes_name))
     # return img, np.array(points), np.array(class)
-    return img, np.array(points)
+    return img, np.array(points), np.array(class_num)
 
 # random crop augumentation
 def random_crop(img, den, num_patch=4):
