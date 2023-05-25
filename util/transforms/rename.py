@@ -1,7 +1,7 @@
 import os
 
 # 设置文件夹路径
-png_folder = '/home/ipad_remote/P2PNET_ROOT/dota_split/DOTA_split_small/val/images'
+png_folder = ''
 txt_folder = '/home/ipad_remote/P2PNET_ROOT/dota_split/DOTA_split_small/val/gt'
 
 # 获取文件列表

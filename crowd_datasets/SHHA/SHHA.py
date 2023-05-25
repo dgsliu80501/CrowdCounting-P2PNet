@@ -88,7 +88,7 @@ class SHHA(Dataset):
             image_id = int(img_path.split('/')[-1].split('.')[0].split('_')[-1]) # TODO 这里的image_id得改
             image_id = torch.Tensor([image_id]).long()
             target[i]['image_id'] = image_id 
-            target[i]['labels'] = torch.ones([point[i].shape[0]]).long()
+            target[i]['labels'] = torch.ones([point[i].shape[0]]).long() # TODO 标签修改这里即可
         return img, target
 
 

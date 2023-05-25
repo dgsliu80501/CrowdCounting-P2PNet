@@ -44,7 +44,7 @@ class RegressionModel(nn.Module):
 
         return out.contiguous().view(out.shape[0], -1, 2)
 
-# the network frmawork of the classification branch
+# the network frmawork of the classification branch、
 class ClassificationModel(nn.Module):
     def __init__(self, num_features_in, num_anchor_points=4, num_classes=80, prior=0.01, feature_size=256):
         super(ClassificationModel, self).__init__()
@@ -74,15 +74,15 @@ class ClassificationModel(nn.Module):
         out = self.conv2(out)
         out = self.act2(out)
 
-        out = self.output(out)
+        out = self.output(out) # torch.Size([32, 256, 16, 16])
 
-        out1 = out.permute(0, 2, 3, 1)
+        out1 = out.permute(0, 2, 3, 1) # torch.Size([32, 16, 16, 8])
 
         batch_size, width, height, _ = out1.shape
 
-        out2 = out1.view(batch_size, width, height, self.num_anchor_points, self.num_classes)
+        out2 = out1.view(batch_size, width, height, self.num_anchor_points, self.num_classes) # torch.Size([32, 16, 16, 4, 2])
 
-        return out2.contiguous().view(x.shape[0], -1, self.num_classes)
+        return out2.contiguous().view(x.shape[0], -1, self.num_classes) # torch.Size([32, 1024, 2])
 
 # generate the reference points in grid layout
 def generate_anchor_points(stride=16, row=3, line=3):
@@ -195,7 +195,7 @@ class P2PNet(nn.Module):
     def __init__(self, backbone, row=2, line=2):
         super().__init__()
         self.backbone = backbone
-        self.num_classes = 2
+        self.num_classes = 2 # 类别数
         # the number of all anchor points
         num_anchor_points = row * line
 
@@ -217,7 +217,7 @@ class P2PNet(nn.Module):
         batch_size = features[0].shape[0]
         # run the regression and classification branch
         regression = self.regression(features_fpn[1]) * 100 # 8x
-        classification = self.classification(features_fpn[1])
+        classification = self.classification(features_fpn[1]) # torch.Size([32, 1024, 2])
         anchor_points = self.anchor_points(samples).repeat(batch_size, 1, 1)
         # decode the points as prediction
         output_coord = regression + anchor_points
@@ -252,12 +252,12 @@ class SetCriterion_Crowd(nn.Module):
         targets dicts must contain the key "labels" containing a tensor of dim [nb_target_boxes]
         """
         assert 'pred_logits' in outputs
-        src_logits = outputs['pred_logits']
+        src_logits = outputs['pred_logits'] # torch.Size([32, 1024, 2])
 
         idx = self._get_src_permutation_idx(indices)
         target_classes_o = torch.cat([t["labels"][J] for t, (_, J) in zip(targets, indices)])
         target_classes = torch.full(src_logits.shape[:2], 0,
-                                    dtype=torch.int64, device=src_logits.device)
+                                    dtype=torch.int64, device=src_logits.device) # target_classes.shape: torch.Size([32, 1024])
         target_classes[idx] = target_classes_o
 
         loss_ce = F.cross_entropy(src_logits.transpose(1, 2), target_classes, self.empty_weight)
